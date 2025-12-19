@@ -47,7 +47,7 @@ For illustration, we look at an idealized, general, professional scenario in whi
 * One profile per app (App ID), platform (iOS, macOS ...), and deployment type (development / distribution) is required.
   - Example: MyApp macOS Development Profile
   - **Note**: Even with the universal "Apple Development" / "Apple Distribution" certificates and an App ID shared between iOS and macOS (universal apps), you strictly need **separate provisioning profiles** for each platform. For example because many entitlements and capabilities are platform-specific. Also because the actual built binaries and resulting app bundles are platform-specific.
-  - **Installation**: When manually signing, you typically **download** the `.mobileprovision` file from the portal and **double-click** it. This installs it into Xcode's local library. While Xcode has a "Download Manual Profiles" button in Preferences, the explicit download-and-install is often more reliable.
+  - **Installation**: When manually signing, you typically **download** the directly in Xcode when selecting the profile for a build configuration and platform.
 * Each profile uses one of the two certificates (development / distribution) according to its intended deployment type.
 * When creating a distribution profile, the unspecific option "App Store" refers to the iOS App Store.
 * The same signing identity (certificate) may be referenced by multiple profiles. For example, device tests might use a dedicated profile that contains the corresponding test devices.
