@@ -40,14 +40,14 @@ For illustration, we look at an idealized, general, professional scenario in whi
 
 * Only two certificates are needed: Development and Distribution. These are used to sign **all apps** on **all developer machines**. Install them, along with their private keys, on each developer's machine.
 * Universal "**Apple** Development" and "**Apple** Distribution" certificates cover both macOS and iOS.
-* A developer can generate a certificate on their machine, storing it locally in Keychain Access.
-* Certificates are typically installed in the "Login" keychain, but using "iCloud" could be useful for a developer working across multiple machines.
+* A developer can generate a certificate on their machine, storing it locally in Keychain Access. Note: Certificates are installed in the "login" keychain, they can NOT be moved to- or stored in the "iCloud" keychain. You must share them in the team by securely sharing the .p12 file and its passphrase via other means.
 
 ### Profiles
 
 * One profile per app (App ID), platform (iOS, macOS ...), and deployment type (development / distribution) is required.
   - Example: MyApp macOS Development Profile
   - **Note**: Even with the universal "Apple Development" / "Apple Distribution" certificates and an App ID shared between iOS and macOS (universal apps), you strictly need **separate provisioning profiles** for each platform. For example because many entitlements and capabilities are platform-specific. Also because the actual built binaries and resulting app bundles are platform-specific.
+  - **Installation**: When manually signing, you typically **download** the `.mobileprovision` file from the portal and **double-click** it. This installs it into Xcode's local library. While Xcode has a "Download Manual Profiles" button in Preferences, the explicit download-and-install is often more reliable.
 * Each profile uses one of the two certificates (development / distribution) according to its intended deployment type.
 * When creating a distribution profile, the unspecific option "App Store" refers to the iOS App Store.
 * The same signing identity (certificate) may be referenced by multiple profiles. For example, device tests might use a dedicated profile that contains the corresponding test devices.
@@ -61,6 +61,10 @@ For illustration, we look at an idealized, general, professional scenario in whi
   - **Ad-Hoc (Local)**: No explicit signing or UDID registration required. "Sign to Run Locally" works for basic debugging on your own machine.
   - **Fully Signed**: If you use a real "Apple Development" certificate (e.g., to test **iCloud**, **Push Notifications**, or other restricted entitlements), you **must** register the Mac's **UDID** (not the UUID!) in the developer account and include it in the profile.
 * The Simulator (iOS/iPadOS/watchOS/tvOS/visionOS) doesn't enforce code signing.
+* **Finding an iPhone/iPad UDID**:
+    * **Connect** your iPhone/iPad to your Mac.
+    * Option 1: **Finder**: Select the device in the sidebar. Click the gray subtitle text (e.g., "iPhone 13 Pro - 128 GB") **multiple times**. It will cycle through Serial Number -> UDID. Right-click to copy.
+    * Option 2: **Xcode**: Window -> Devices and Simulators. Select device. Copy "Identifier".
 
 ### Security and Storage Locations 
 
@@ -68,7 +72,8 @@ For illustration, we look at an idealized, general, professional scenario in whi
   - A certificate, along with its private key, must be securely shared with the team. A private git repo is generally not considered secure enough for this purpose, so use something like a password manager. This applies even to development certificates.
   - A certificate is created by a developer with their local Keychain Access app and the team's Apple Dev Account. But the dev account only stores the public certificate (.cer file) and not the private key.
   - A certificate including its private key can be exported from Keychain Access as a password protected .p12 file for the purpose of sharing it securely with the team.
-  - Since the exported .p12 file bundles the private key AND the public certificate, developers only need to obtain this file and its passphrase from the password manager.
+  - If the .p12 file itself is not stored in a password manager (not all password managers allow file storage), it is best practice to encrypt it (in addition to its own passphrase protection).
+  - Since the exported .p12 file bundles the private key AND the public certificate, developers only need to obtain this file and its passphrase (for example from the password manager).
 * Profiles:
   - A provisioning profile does not contain cryptographically critical infos like private keys, so no attacker could sign an app with just a profile. 
   - But a profile contains sensitive/internal metadata (testing devices' UDIDs, App IDs, entitlement details), which (if leaked) would give an attacker reconnaissance info.
